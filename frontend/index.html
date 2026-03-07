@@ -2,38 +2,60 @@
 <html>
 <head>
 <title>Quotes Chatbot</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/style.css">
 </head>
 
 <body>
 
-<h2>Quotes Chatbot 🤖</h2>
+<div class="chat-container">
 
-<input type="text" id="userInput" placeholder="Ask something...">
+<div class="chat-header">
+<h3>Quotes Chatbot</h3>
+<p>Ask for inspiration, motivation, success, love, or humor.</p>
+</div>
+
+<div id="chatbox" class="chat-box">
+<div class="bot-message">
+Hi, I am your Quotes Recommendation Chatbot. Ask me for a quote by mood or category.
+</div>
+</div>
+
+<div class="input-area">
+<input type="text" id="userInput" placeholder="Type your message...">
 <button onclick="sendMessage()">Send</button>
+</div>
 
-<p id="response"></p>
+</div>
 
 <script>
 
 function sendMessage(){
 
-let message = document.getElementById("userInput").value;
+let userInput = document.getElementById("userInput").value;
 
-fetch("http://127.0.0.1:5000/chat", {
-method: "POST",
-headers: {
-"Content-Type": "application/json"
+fetch("/get",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
 },
-body: JSON.stringify({
-message: message
-})
+body:JSON.stringify({message:userInput})
 })
 
-.then(response => response.json())
-.then(data => {
-document.getElementById("response").innerText = "Bot: " + data.reply;
-});
+.then(response=>response.json())
+
+.then(data=>{
+
+let chatbox=document.getElementById("chatbox")
+
+chatbox.innerHTML += `<div class="user-message">${userInput}</div>`
+
+chatbox.innerHTML += `<div class="bot-message">${data.reply}</div>`
+
+document.getElementById("userInput").value=""
+
+chatbox.scrollTop = chatbox.scrollHeight
+
+})
 
 }
 
