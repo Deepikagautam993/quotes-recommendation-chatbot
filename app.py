@@ -1,38 +1,21 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import json
-import random
+from flask import Flask, request, jsonify, send_from_directory
+from chatbot import get_response
 
 app = Flask(__name__)
-CORS(app)
 
-# Load quotes
-with open("data/quotes.json", "r") as file:
-    quotes = json.load(file)
+@app.route("/")
+def home():
+    return send_from_directory("frontend", "index.html")
 
-motivation_quotes = quotes["motivation"]
-love_quotes = quotes["love"]
-funny_quotes = quotes["funny"]
+@app.route("/style.css")
+def css():
+    return send_from_directory("frontend", "style.css")
 
-@app.route("/chat", methods=["POST"])
-def chat():
-
-    data = request.get_json()
-    user_input = data["message"].lower()
-
-    if "motivation" in user_input:
-        response = random.choice(motivation_quotes)
-
-    elif "love" in user_input:
-        response = random.choice(love_quotes)
-
-    elif "funny" in user_input or "joke" in user_input:
-        response = random.choice(funny_quotes)
-
-    else:
-        response = "Sorry, I can give motivation, love, or funny quotes."
-
-    return jsonify({"reply": response})
+@app.route("/get", methods=["POST"])
+def chatbot_response():
+    user_message = request.json["message"]
+    bot_reply = get_response(user_message)
+    return jsonify({"reply": bot_reply})
 
 if __name__ == "__main__":
     app.run(debug=True)
